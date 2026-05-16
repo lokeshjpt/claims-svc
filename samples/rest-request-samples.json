@@ -1,0 +1,104 @@
+[
+  {
+    "mode": "percentage-after-deductible",
+    "payload": {
+      "policyId": "100001",
+      "policyHolderId": "1000011",
+      "dateOfService": "2016-05-10",
+      "coverageMainCategory": "Inpatient Hospital Care",
+      "coverageSubCategory": "ROOM AND BOARD",
+      "billedAmount": 1000.0,
+      "individualAccumulatedDeductible": 0.0,
+      "familyAccumulatedDeductible": 0.0
+    }
+  },
+  {
+    "mode": "no-charge",
+    "payload": {
+      "policyId": "100003",
+      "policyHolderId": "1000031",
+      "dateOfService": "2016-05-10",
+      "coverageMainCategory": "Preventive Care",
+      "coverageSubCategory": "ROUTINE PHYSICAL EXAM, MAMMOGRAMS, ETC.",
+      "billedAmount": 200.0,
+      "individualAccumulatedDeductible": 2500.0,
+      "familyAccumulatedDeductible": 2500.0
+    }
+  },
+  {
+    "mode": "flat-dollar",
+    "payload": {
+      "policyId": "100007",
+      "policyHolderId": "1000071",
+      "dateOfService": "2016-08-01",
+      "coverageMainCategory": "Emergency And Urgent Care",
+      "coverageSubCategory": "URGENT CARE VISIT",
+      "billedAmount": 250.0,
+      "individualAccumulatedDeductible": 4460.82,
+      "familyAccumulatedDeductible": 4460.82
+    }
+  },
+  {
+    "mode": "error-E0001-unknown-holder",
+    "payload": {
+      "policyId": "100001",
+      "policyHolderId": "9999999",
+      "dateOfService": "2016-10-12",
+      "coverageMainCategory": "Prescription Drugs",
+      "coverageSubCategory": "GENERIC",
+      "billedAmount": 61.4
+    }
+  },
+  {
+    "mode": "error-E0002-coverage-not-active",
+    "payload": {
+      "policyId": "100004",
+      "policyHolderId": "1000041",
+      "dateOfService": "2015-12-31",
+      "coverageMainCategory": "Outpatient Services",
+      "coverageSubCategory": "PRIMARY CARE OFFICE VISIT",
+      "billedAmount": 150.0
+    }
+  },
+  {
+    "mode": "error-E0003-unknown-subcategory",
+    "payload": {
+      "policyId": "100002",
+      "policyHolderId": "1000021",
+      "dateOfService": "2016-06-15",
+      "coverageMainCategory": "Preventive Care",
+      "coverageSubCategory": "UNKNOWN SUBCATEGORY XYZ",
+      "billedAmount": 350.0
+    }
+  },
+  {
+    "mode": "error-E0004-future-dated",
+    "payload": {
+      "policyId": "100002",
+      "policyHolderId": "1000021",
+      "dateOfService": "2017-01-15",
+      "coverageMainCategory": "Outpatient Services",
+      "coverageSubCategory": "LAB TESTS",
+      "billedAmount": 1200.0
+    }
+  },
+  {
+    "mode": "error-E0005-malformed-missing-fields",
+    "payload": {
+      "policyId": "",
+      "policyHolderId": "",
+      "billedAmount": -10
+    }
+  },
+  {
+    "mode": "error-E0005-malformed-missing-date",
+    "payload": {
+      "policyId": "100001",
+      "policyHolderId": "1000011",
+      "coverageMainCategory": "Inpatient Hospital Care",
+      "coverageSubCategory": "ROOM AND BOARD",
+      "billedAmount": 1000.0
+    }
+  }
+]
+

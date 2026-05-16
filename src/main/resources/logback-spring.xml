@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Logback configuration for Claims Processor.
+
+  Strategy:
+  - Inherit Spring Boot's console + main file appenders (defaults.xml + console-appender.xml + file-appender.xml).
+    The application.yml `logging.file.name` + `logging.logback.rollingpolicy.*` properties drive the main
+    rolling file `logs/claims-processor.log` (daily + size-based rollover, gz-compressed history).
+  - Add a SECOND rolling appender dedicated to the audit logger
+    (`com.abc.claims.audit.ClaimAuditLogger`) so every processed claim is captured to
+    `logs/claims-audit.log` for compliance / replay. The audit logger continues to log to
+    console + main file as well (additivity is left enabled).
+-->
+<configuration scan="true" scanPeriod="30 seconds">
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+    <include resource="org/springframework/boot/logging/logback/file-appender.xml"/>
+
+    <property name="AUDIT_LOG_FILE" value="${LOG_PATH:-logs}/claims-audit.log"/>
+    <property name="AUDIT_LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%X{user:-anonymous}] %msg%n"/>
+
+    <appender name="AUDIT_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${AUDIT_LOG_FILE}</file>
+        <encoder>
+            <pattern>${AUDIT_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH:-logs}/claims-audit-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>90</maxHistory>
+            <totalSizeCap>2GB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="FILE"/>
+    </root>
+
+    <logger name="com.abc.claims.audit" level="INFO" additivity="true">
+        <appender-ref ref="AUDIT_FILE"/>
+    </logger>
+
+</configuration>

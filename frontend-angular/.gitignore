@@ -1,0 +1,7 @@
+node_modules/
+dist/
+.angular/
+*.log
+.DS_Store
+coverage/
+out-tsc/

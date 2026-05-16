@@ -1,0 +1,94 @@
+server:
+  servlet:
+    # Context root keeps the app routable behind a shared ingress / API gateway
+    # without colliding with /api/v1/claims (the REST URI). Effective URLs:
+    #   REST:      http://host:8080/claims-svc/api/v1/claims
+    #   GUI:       http://host:8080/claims-svc/
+    #   Actuator:  http://host:8080/claims-svc/actuator/health
+    #   Swagger:   http://host:8080/claims-svc/swagger-ui.html
+    context-path: /claims-svc
+
+spring:
+  application:
+    name: claims-processor
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+      - org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.redis.RedisRepositoriesAutoConfiguration
+      - org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration
+      - org.springframework.boot.autoconfigure.data.mongo.MongoDataAutoConfiguration
+
+claims:
+  data:
+    xlsx-path: ./SamplePlanAndTransactionData_1.xlsx
+  validation:
+    max-service-date: 2016-12-31
+
+# ----------------------------------------------------------------------------
+# Actuator + Micrometer / Prometheus
+# ----------------------------------------------------------------------------
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,env,loggers
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true
+  metrics:
+    tags:
+      application: ${spring.application.name}
+  prometheus:
+    metrics:
+      export:
+        enabled: true
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: ${spring.application.name}
+    description: ABC Health claims transaction processor (Java 25 / Spring Boot 3.4)
+    version: 1.0.0
+    java: 25
+
+# ----------------------------------------------------------------------------
+# springdoc / OpenAPI 3 / Swagger UI
+# ----------------------------------------------------------------------------
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    tryItOutEnabled: true
+    persistAuthorization: true
+
+# ----------------------------------------------------------------------------
+# Logging
+# ----------------------------------------------------------------------------
+logging:
+  level:
+    root: INFO
+    com.abc.claims: INFO
+    com.abc.claims.audit: INFO
+    org.springframework.security: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{user:-anonymous}] [%thread] %logger{36} - %msg%n"
+    file:    "%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%X{user:-anonymous}] [%thread] %logger{36} - %msg%n"
+  file:
+    # Application log file (rolled by logback-spring.xml — daily + 10MB cap)
+    name: logs/claims-processor.log
+  logback:
+    rollingpolicy:
+      file-name-pattern: "logs/claims-processor-%d{yyyy-MM-dd}.%i.log.gz"
+      max-file-size: 10MB
+      max-history: 30
+      total-size-cap: 1GB

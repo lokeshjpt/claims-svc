@@ -1,0 +1,99 @@
+# ----------------------------------------------------------------------------
+# Java / Maven
+# ----------------------------------------------------------------------------
+target/
+build/
+*.class
+*.jar
+*.war
+*.ear
+*.nar
+hs_err_pid*
+replay_pid*
+dependency-reduced-pom.xml
+.mvn/wrapper/maven-wrapper.jar
+
+# ----------------------------------------------------------------------------
+# Spring Boot / runtime
+# ----------------------------------------------------------------------------
+logs/
+*.log
+*.log.gz
+*.log.*.gz
+*.pid
+spring-shell.log
+
+# ----------------------------------------------------------------------------
+# Node / Angular
+# ----------------------------------------------------------------------------
+node_modules/
+frontend-angular/node_modules/
+frontend-angular/dist/
+frontend-angular/.angular/
+frontend-angular/coverage/
+frontend-angular/tmp/
+frontend-angular/out-tsc/
+frontend-angular/.nx/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.angular/cache/
+
+# ----------------------------------------------------------------------------
+# IDEs / editors
+# ----------------------------------------------------------------------------
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+*.code-workspace
+.eclipse/
+.classpath
+.project
+.settings/
+.factorypath
+.apt_generated/
+.apt_generated_tests/
+.springBeans
+nbproject/private/
+nb-configuration.xml
+
+# ----------------------------------------------------------------------------
+# OS / misc
+# ----------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+
+# ----------------------------------------------------------------------------
+# Build / test reports
+# ----------------------------------------------------------------------------
+surefire-reports/
+failsafe-reports/
+jacoco.exec
+*.coveragexml
+
+# ----------------------------------------------------------------------------
+# Secrets / local config (never commit)
+# ----------------------------------------------------------------------------
+*.env
+.env.*
+application-local.yml
+application-local.properties
+application-secrets.yml
+secrets/
+*.pem
+*.key
+*.p12
+*.jks
+
+# ----------------------------------------------------------------------------
+# Generated outputs from sample runs
+# ----------------------------------------------------------------------------
+results.html
+samples/output-claims-actual.csv

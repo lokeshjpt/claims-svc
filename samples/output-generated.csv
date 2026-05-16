@@ -1,0 +1,4 @@
+"PolicyId","Policy holder Id","Date of service","Coverage Main Category","Coverage Sub Category","Billed Amount","Policy Holder pays","Plan Pays","Rule used","Individual accumulated deductible as of service date","Family accumulated deductible as of service date","Error Code","Error Message","Processing message"
+"100001","1000011","2016-05-10","Inpatient Hospital Care","ROOM AND BOARD","1000","1000","0","40% AFTER DEDUCTIBLE","1000","1000","","","ANNUAL DEDUCTIBLE (INDIVIDUAL or FAMILY) not met, plan pays 0%"
+"100003","1000031","2016-05-10","Preventive Care","ROUTINE PHYSICAL EXAM, MAMMOGRAMS, ETC.","200","0","200","No Charge","2500","2500","","","NO CHARGE coverage; plan pays 100%"
+"100007","1000071","2016-08-01","Emergency And Urgent Care","URGENT CARE VISIT","250","130","120","$120","4590.82","4590.82","","","FLAT DOLLAR coverage applied; plan pays $120"

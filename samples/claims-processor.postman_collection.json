@@ -1,0 +1,212 @@
+{
+  "info": {
+    "name": "Claims Processor API",
+    "description": "ABC Health Insurance — claims transaction processing REST + GUI (Java 25 / Spring Boot 3.4).\n\n**Base URL:** {{baseUrl}} (default http://localhost:8080)\n**Context root:** /claims-svc\n\nAll API calls hit `POST /claims-svc/api/v1/claims`. The GUI upload calls `POST /claims-svc/process` (multipart).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "basic",
+    "basic": [
+      { "key": "username", "value": "{{username}}", "type": "string" },
+      { "key": "password", "value": "{{password}}", "type": "string" }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    { "key": "username", "value": "processor", "type": "string" },
+    { "key": "password", "value": "claims123", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "REST — Happy path (percentage after deductible)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" },
+          { "key": "Accept", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/claims-svc/api/v1/claims",
+          "host": ["{{baseUrl}}"], "path": ["claims-svc","api","v1","claims"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"policyId\": \"100001\",\n  \"policyHolderId\": \"1000011\",\n  \"dateOfService\": \"2016-05-08\",\n  \"coverageMainCategory\": \"Inpatient Hospital Care\",\n  \"coverageSubCategory\": \"ROOM AND BOARD\",\n  \"billedAmount\": 1000,\n  \"individualAccumulatedDeductible\": 6000,\n  \"familyAccumulatedDeductible\": 6000\n}"
+        },
+        "description": "Holder has already met the $6000 individual deductible from prior claims. Plan now pays 40%. Expect policyHolderPays=600, planPays=400, ruleUsed=\"40% AFTER DEDUCTIBLE\"."
+      }
+    },
+    {
+      "name": "REST — No Charge (preventive care)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/claims-svc/api/v1/claims",
+          "host": ["{{baseUrl}}"], "path": ["claims-svc","api","v1","claims"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"policyId\": \"100002\",\n  \"policyHolderId\": \"1000021\",\n  \"dateOfService\": \"2016-06-15\",\n  \"coverageMainCategory\": \"Preventive Care\",\n  \"coverageSubCategory\": \"ROUTINE PHYSICAL EXAM\",\n  \"billedAmount\": 350,\n  \"individualAccumulatedDeductible\": 4000,\n  \"familyAccumulatedDeductible\": 4000\n}"
+        },
+        "description": "Preventive care is fully covered. Expect policyHolderPays=0, planPays=350, ruleUsed=\"No Charge\"."
+      }
+    },
+    {
+      "name": "REST — Flat dollar ($120 urgent care)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/claims-svc/api/v1/claims",
+          "host": ["{{baseUrl}}"], "path": ["claims-svc","api","v1","claims"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"policyId\": \"100007\",\n  \"policyHolderId\": \"1000071\",\n  \"dateOfService\": \"2016-07-10\",\n  \"coverageMainCategory\": \"Emergency And Urgent Care\",\n  \"coverageSubCategory\": \"URGENT CARE VISIT\",\n  \"billedAmount\": 250,\n  \"individualAccumulatedDeductible\": 4460.82,\n  \"familyAccumulatedDeductible\": 4460.82\n}"
+        },
+        "description": "Plan pays a flat $120 regardless of deductible. Expect policyHolderPays=130, planPays=120, ruleUsed=\"$120\"."
+      }
+    },
+    {
+      "name": "REST — E0001 unknown holder",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/claims-svc/api/v1/claims",
+          "host": ["{{baseUrl}}"], "path": ["claims-svc","api","v1","claims"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"policyId\": \"100001\",\n  \"policyHolderId\": \"1000016\",\n  \"dateOfService\": \"2016-10-12\",\n  \"coverageMainCategory\": \"Prescription Drugs\",\n  \"coverageSubCategory\": \"GENERIC\",\n  \"billedAmount\": 61.4\n}"
+        },
+        "description": "Policy holder 1000016 does not exist. Expect errorCode=\"E0001\"."
+      }
+    },
+    {
+      "name": "REST — E0002 outside coverage period",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/claims-svc/api/v1/claims",
+          "host": ["{{baseUrl}}"], "path": ["claims-svc","api","v1","claims"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"policyId\": \"100004\",\n  \"policyHolderId\": \"1000041\",\n  \"dateOfService\": \"2016-06-15\",\n  \"coverageMainCategory\": \"Outpatient Services\",\n  \"coverageSubCategory\": \"PRIMARY CARE OFFICE VISIT\",\n  \"billedAmount\": 150\n}"
+        },
+        "description": "Holder 1000041's coverage ended 2016-05-31. Expect errorCode=\"E0002\"."
+      }
+    },
+    {
+      "name": "REST — E0003 unknown service category",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/claims-svc/api/v1/claims",
+          "host": ["{{baseUrl}}"], "path": ["claims-svc","api","v1","claims"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"policyId\": \"100002\",\n  \"policyHolderId\": \"1000021\",\n  \"dateOfService\": \"2016-06-15\",\n  \"coverageMainCategory\": \"Preventive Care\",\n  \"coverageSubCategory\": \"UNKNOWN SUBCATEGORY XYZ\",\n  \"billedAmount\": 350\n}"
+        },
+        "description": "No coverage rule found for the sub-category. Expect errorCode=\"E0003\"."
+      }
+    },
+    {
+      "name": "REST — E0004 future-dated claim",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/claims-svc/api/v1/claims",
+          "host": ["{{baseUrl}}"], "path": ["claims-svc","api","v1","claims"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"policyId\": \"100002\",\n  \"policyHolderId\": \"1000021\",\n  \"dateOfService\": \"2017-01-15\",\n  \"coverageMainCategory\": \"Outpatient Services\",\n  \"coverageSubCategory\": \"LAB TESTS\",\n  \"billedAmount\": 1200\n}"
+        },
+        "description": "Date of service is after the configured max (2016-12-31). Expect errorCode=\"E0004\"."
+      }
+    },
+    {
+      "name": "REST — E0005 malformed (blank IDs, negative amount)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/claims-svc/api/v1/claims",
+          "host": ["{{baseUrl}}"], "path": ["claims-svc","api","v1","claims"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"policyId\": \"\",\n  \"policyHolderId\": \"\",\n  \"billedAmount\": -10\n}"
+        },
+        "description": "Missing/malformed required fields. Returns HTTP 200 with errorCode=\"E0005\" in body — consistent with how CSV/GUI modes report row-level errors."
+      }
+    },
+    {
+      "name": "REST — E0005 malformed (missing date of service)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/claims-svc/api/v1/claims",
+          "host": ["{{baseUrl}}"], "path": ["claims-svc","api","v1","claims"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"policyId\": \"100001\",\n  \"policyHolderId\": \"1000011\",\n  \"coverageMainCategory\": \"Inpatient Hospital Care\",\n  \"coverageSubCategory\": \"ROOM AND BOARD\",\n  \"billedAmount\": 1000\n}"
+        },
+        "description": "Missing dateOfService. Returns HTTP 200 with errorCode=\"E0005\"."
+      }
+    },
+    {
+      "name": "GUI — Upload CSV (multipart)",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/claims-svc/process",
+          "host": ["{{baseUrl}}"], "path": ["claims-svc","process"]
+        },
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "file",
+              "type": "file",
+              "src": "samples/sample-transactions.csv",
+              "description": "Pick samples/sample-transactions.csv (or sample-transactions-with-errors.csv) in Postman."
+            }
+          ]
+        },
+        "description": "Multipart file upload to the GUI controller. Returns rendered HTML (results.html) — best viewed in a browser; Postman will show the raw HTML body."
+      }
+    }
+  ]
+}
+

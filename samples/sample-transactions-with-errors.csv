@@ -1,0 +1,9 @@
+PolicyId,Policy holder Id,Date of service,Coverage Main Category,Coverage Sub Category,Billed Amount
+100001,1000011,2016-05-08,Inpatient Hospital Care,ROOM AND BOARD,1000
+100002,1000021,2016-06-15,Preventive Care,ROUTINE PHYSICAL EXAM,350
+100007,1000071,2016-07-10,Emergency And Urgent Care,URGENT CARE VISIT,250
+100001,1000016,2016-10-12,Prescription Drugs,GENERIC,61.4
+100004,1000041,2015-12-31,Outpatient Services,PRIMARY CARE OFFICE VISIT,150
+100002,1000021,2016-06-15,Preventive Care,UNKNOWN SUBCATEGORY XYZ,350
+100002,1000021,2017-01-15,Outpatient Services,LAB TESTS,1200
+100001,1000011,not-a-date,Inpatient Hospital Care,ROOM AND BOARD,not-a-number
