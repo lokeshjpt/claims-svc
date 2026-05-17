@@ -1,5 +1,6 @@
 package com.abc.claims.security;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -33,6 +34,7 @@ import org.springframework.security.web.SecurityFilterChain;
  * and validate JWTs issued by Azure Entra ID / Cognito. The role names stay the same.
  */
 @Configuration
+@ConditionalOnWebApplication
 public class SecurityConfig {
 
     @Bean
@@ -42,10 +44,10 @@ public class SecurityConfig {
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                        "/actuator/health/**", "/actuator/info", "/actuator/prometheus",
-                        "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html",
+                        "/actuator/health/**", "/v3/api-docs/**",
                         "/error", "/favicon.ico").permitAll()
-                .requestMatchers("/actuator/**").hasRole("ADMIN")
+                .requestMatchers("/actuator/**", "/actuator/info", "/actuator/prometheus",
+                        "/swagger-ui/**", "/swagger-ui.html").hasRole("ADMIN")
                 .requestMatchers("/api/**").hasRole("PROCESSOR")
                 .requestMatchers("/process", "/process/**", "/").hasRole("PROCESSOR")
                 .anyRequest().authenticated())
