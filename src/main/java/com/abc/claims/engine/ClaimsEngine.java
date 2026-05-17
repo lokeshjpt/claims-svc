@@ -60,19 +60,31 @@ public class ClaimsEngine {
     }
 
     public ClaimResult processForBatchOrGui(ClaimRequest request) {
-        return process(request, statefulDeductibleService, false);
+        return process(request, statefulDeductibleService);
     }
 
+    /**
+     * Stateless API entry point.
+     *
+     * <p>Per the assessment, the REST caller passes the running deductible totals on every call
+     * (in production these would be fetched from Oracle/Redis on the way in). We must therefore
+     * <b>not</b> consult the long-lived {@link DeductibleService} — its in-process totals would
+     * contaminate the calculation and break idempotency.</p>
+     *
+     * <p>We build a throwaway {@link InMemoryDeductibleService} seeded with the caller's two
+     * values, run it through the shared {@link #process(ClaimRequest, DeductibleService)} path,
+     * then let it go out of scope. No state escapes the method.</p>
+     */
     public ClaimResult processForApi(ClaimRequest request) {
-        DeductibleService caller = perRequestStore(request);
-        return process(request, caller, true);
+        DeductibleService perRequest = perRequestStore(request);
+        return process(request, perRequest);
     }
 
     public List<ClaimResult> processBatch(List<ClaimRequest> requests) {
         return requests.stream().map(this::processForBatchOrGui).toList();
     }
 
-    private ClaimResult process(ClaimRequest request, DeductibleService deductibleService, boolean statelessApiMode) {
+    private ClaimResult process(ClaimRequest request, DeductibleService deductibleService) {
         Optional<PolicyHolder> holderOpt = policyDao.findByHolderId(request.policyHolderId());
         Optional<String> rawCoverageRule = holderOpt.flatMap(holder ->
                 coverageDao.findRule(holder.planId(), request.coverageMainCategory(), request.coverageSubCategory()));
