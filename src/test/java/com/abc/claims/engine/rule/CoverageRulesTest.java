@@ -22,7 +22,7 @@ class CoverageRulesTest {
         assertThat(calc.policyHolderPays()).isEqualByComparingTo("0");
         assertThat(calc.planPays()).isEqualByComparingTo("350");
         assertThat(calc.accumulatesToDeductible()).isFalse();
-        assertThat(calc.processingMessage()).contains("NO CHARGE");
+        assertThat(calc.processingMessage()).contains("No Charge");
     }
 
     @Test
@@ -89,13 +89,15 @@ class CoverageRulesTest {
     }
 
     @Test
-    @DisplayName("PercentageAfterDeductible: deductible NOT met & billed crosses threshold → plan pays % of overage")
+    @DisplayName("PercentageAfterDeductible: deductible NOT met, billed would cross threshold → still holder pays 100% (atomic, pre-claim determination)")
     void percentage_crosses_threshold() {
         CoverageCalculation calc = new PercentageAfterDeductibleRule(new BigDecimal("0.40"), "40% AFTER DEDUCTIBLE").apply(
                 new BigDecimal("1000"), plan, new BigDecimal("5500"), new BigDecimal("5500"));
 
-        // remaining = min(500, 6500) = 500 → overage = 500 → planPays = 500*0.40 = 200, holderPays = 800
-        assertThat(calc.planPays()).isEqualByComparingTo("200");
-        assertThat(calc.policyHolderPays()).isEqualByComparingTo("800");
+        // Spec: determination is made once, pre-claim. Since neither threshold is met before
+        // this claim, holder pays full $1000; the threshold is crossed for the NEXT claim.
+        assertThat(calc.planPays()).isEqualByComparingTo("0");
+        assertThat(calc.policyHolderPays()).isEqualByComparingTo("1000");
+        assertThat(calc.processingMessage()).contains("not met");
     }
 }

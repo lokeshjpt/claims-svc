@@ -12,7 +12,7 @@ public record NoChargeRule(String rawRule) implements CoverageRule {
                 BigDecimal.ZERO,
                 billedAmount,
                 false,
-                "NO CHARGE coverage; plan pays 100%"
+                "Preventive Care - No Charge to policyholder"
         );
     }
 }

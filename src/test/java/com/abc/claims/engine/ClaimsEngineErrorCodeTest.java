@@ -92,7 +92,7 @@ class ClaimsEngineErrorCodeTest {
                 new BigDecimal("250"), new BigDecimal("4460.82"), new BigDecimal("4460.82")));
 
         assertThat(r.errorCode()).isNull();
-        assertThat(r.ruleUsed()).isEqualTo("$120");
+        assertThat(r.ruleUsed()).isEqualTo("$120 FLAT");
         assertThat(r.planPays()).isEqualByComparingTo("120");
         assertThat(r.policyHolderPays()).isEqualByComparingTo("130");
     }

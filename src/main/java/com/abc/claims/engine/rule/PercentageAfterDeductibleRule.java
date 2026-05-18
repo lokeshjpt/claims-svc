@@ -18,30 +18,26 @@ public record PercentageAfterDeductibleRule(BigDecimal planPaysFraction, String 
             planPays = billedAmount.multiply(planPaysFraction);
             holderPays = billedAmount.subtract(planPays);
         } else {
-            BigDecimal remainingIndividual = plan.individualDeductibleThreshold().subtract(individualYTD).max(BigDecimal.ZERO);
-            BigDecimal remainingFamily = plan.familyDeductibleThreshold().subtract(familyYTD).max(BigDecimal.ZERO);
-            BigDecimal remainingToDeductible = remainingIndividual.min(remainingFamily);
-            if (billedAmount.compareTo(remainingToDeductible) <= 0) {
-                planPays = BigDecimal.ZERO;
-                holderPays = billedAmount;
-            } else {
-                BigDecimal overage = billedAmount.subtract(remainingToDeductible);
-                planPays = overage.multiply(planPaysFraction);
-                holderPays = billedAmount.subtract(planPays);
-            }
+            // Spec: "If neither individual nor family deductible has reached its threshold,
+            // policyholder pays 100%, plan pays 0%." The determination is made once, before
+            // the claim, based on pre-claim YTD totals -- no straddling within a single claim.
+            planPays = BigDecimal.ZERO;
+            holderPays = billedAmount;
         }
         return new CoverageCalculation(holderPays, planPays, true, message(individualMet, familyMet));
     }
 
     private String message(boolean individualMet, boolean familyMet) {
+        String pct = planPaysFraction.multiply(BigDecimal.valueOf(100))
+                .stripTrailingZeros().toPlainString() + "%";
         if (individualMet && familyMet) {
-            return "ANNUAL DEDUCTIBLE (INDIVIDUAL and FAMILY) met, plan pays based on " + rawRule;
+            return "ANNUAL DEDUCTIBLE (INDIVIDUAL and FAMILY) met, plan pays " + pct;
         }
         if (individualMet) {
-            return "ANNUAL DEDUCTIBLE (INDIVIDUAL) met, plan pays based on " + rawRule;
+            return "ANNUAL DEDUCTIBLE (INDIVIDUAL) met, plan pays " + pct;
         }
         if (familyMet) {
-            return "ANNUAL DEDUCTIBLE (FAMILY) met, plan pays based on " + rawRule;
+            return "ANNUAL DEDUCTIBLE (FAMILY) met, plan pays " + pct;
         }
         return "ANNUAL DEDUCTIBLE (INDIVIDUAL or FAMILY) not met, plan pays 0%";
     }

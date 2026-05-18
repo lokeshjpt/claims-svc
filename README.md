@@ -70,8 +70,9 @@ java -jar target/claims-processor-1.0.0.jar
 | `processor` | `claims123` | `PROCESSOR` |
 
 - `/api/**`, `/`, `/process/**` → require `PROCESSOR`
-- `/actuator/health`, `/actuator/info`, `/actuator/prometheus`, `/swagger-ui/**`, `/v3/api-docs/**` → public
-- All other `/actuator/**` → require `ADMIN`
+- `/actuator/health` → public (load-balancer probes only)
+- `/actuator/prometheus`, `/actuator/info`, all other `/actuator/**`, `/swagger-ui/**`, `/v3/api-docs/**` → require `ADMIN` basic auth
+- Prometheus scrape config must include `basic_auth: { username: admin, password: admin123 }`; Swagger UI prompts for basic-auth credentials before loading the spec
 
 ---
 
@@ -165,8 +166,8 @@ mvn verify
 # Liveness
 curl -u processor:claims123 http://localhost:8080/claims-svc/actuator/health
 
-# Prometheus metrics — including custom claims_processed_total{channel,status}
-curl http://localhost:8080/claims-svc/actuator/prometheus
+# Prometheus metrics — including custom claims_processed_total{channel,status} — now ADMIN only
+curl -u admin:admin123 http://localhost:8080/claims-svc/actuator/prometheus
 
 # Loggers (ADMIN only)
 curl -u admin:admin123 http://localhost:8080/claims-svc/actuator/loggers

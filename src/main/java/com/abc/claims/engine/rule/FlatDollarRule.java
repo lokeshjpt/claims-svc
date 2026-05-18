@@ -14,7 +14,13 @@ public record FlatDollarRule(BigDecimal planPaysFlatAmount, String rawRule) impl
                 holderPays,
                 planPays,
                 true,
-                "FLAT DOLLAR coverage applied; plan pays $" + planPaysFlatAmount
+                "Flat dollar coverage - plan pays $" + planPaysFlatAmount.stripTrailingZeros().toPlainString() + " regardless of deductible"
         );
+    }
+
+    @Override
+    public String rawRule() {
+        // Match spreadsheet "Rule used" column convention: e.g. "$120 FLAT"
+        return rawRule.trim().toUpperCase().endsWith("FLAT") ? rawRule : rawRule + " FLAT";
     }
 }

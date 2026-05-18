@@ -71,17 +71,33 @@ class SecurityConfigTest {
     }
 
     @Test
-    @DisplayName("/actuator/prometheus is public (Prometheus scraper has no creds)")
+    @DisplayName("/actuator/prometheus requires ADMIN basic auth (anonymous → 401)")
     @WithAnonymousUser
-    void actuator_prometheus_is_public() throws Exception {
+    void actuator_prometheus_requires_admin() throws Exception {
+        mockMvc().perform(get("/actuator/prometheus"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("/actuator/prometheus is reachable with ADMIN role")
+    @WithMockUser(username = "admin", roles = {"ADMIN", "PROCESSOR"})
+    void actuator_prometheus_admin_ok() throws Exception {
         mockMvc().perform(get("/actuator/prometheus"))
                 .andExpect(status().isOk());
     }
 
     @Test
-    @DisplayName("/v3/api-docs is public so Swagger UI works without auth")
+    @DisplayName("/v3/api-docs requires ADMIN basic auth (anonymous → 401)")
     @WithAnonymousUser
-    void openapi_docs_are_public() throws Exception {
+    void openapi_docs_require_admin() throws Exception {
+        mockMvc().perform(get("/v3/api-docs"))
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    @DisplayName("/v3/api-docs is reachable with ADMIN role")
+    @WithMockUser(username = "admin", roles = {"ADMIN", "PROCESSOR"})
+    void openapi_docs_admin_ok() throws Exception {
         mockMvc().perform(get("/v3/api-docs"))
                 .andExpect(status().isOk());
     }

@@ -27,7 +27,10 @@ import org.springframework.security.web.SecurityFilterChain;
  * (no session, no CSRF) — appropriate for server-to-server callers and the Angular
  * SPA when running over TLS. {@code /} and {@code /process} (Thymeleaf GUI) use
  * Basic Auth too; CSRF is disabled for {@code /process} because the upload form has
- * no user-session state to protect. Static resources and health endpoints are open.
+ * no user-session state to protect. {@code /actuator/health/**} is open for
+ * load-balancer probes, but {@code /actuator/prometheus}, all other actuator
+ * endpoints, Swagger UI and {@code /v3/api-docs} are locked to the {@code ADMIN}
+ * role — Prometheus scrapes and OpenAPI consumers must present basic-auth credentials.</p>
  *
  * <p><b>Future state:</b> when this monolith is decomposed into Azure-hosted
  * microservices, swap this configuration for {@code spring-boot-starter-oauth2-resource-server}
@@ -44,10 +47,11 @@ public class SecurityConfig {
             .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers(
-                        "/actuator/health/**", "/v3/api-docs/**",
+                        "/actuator/health/**",
                         "/error", "/favicon.ico").permitAll()
                 .requestMatchers("/actuator/**", "/actuator/info", "/actuator/prometheus",
-                        "/swagger-ui/**", "/swagger-ui.html").hasRole("ADMIN")
+                        "/swagger-ui/**", "/swagger-ui.html",
+                        "/v3/api-docs", "/v3/api-docs/**").hasRole("ADMIN")
                 .requestMatchers("/api/**").hasRole("PROCESSOR")
                 .requestMatchers("/process", "/process/**", "/").hasRole("PROCESSOR")
                 .anyRequest().authenticated())
