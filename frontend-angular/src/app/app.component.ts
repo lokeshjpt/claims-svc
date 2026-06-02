@@ -202,6 +202,7 @@ interface HistoryEntry {
                             <th class="money">Plan</th>
                             <th class="money">Holder</th>
                             <th>Status</th>
+                            <th>Processing message</th>
                           </tr>
                         </thead>
                         <tbody>
@@ -239,6 +240,9 @@ interface HistoryEntry {
                                 <i class="bi bi-exclamation-triangle-fill"></i>
                                 {{ h.response.errorCode }}
                               </span>
+                            </td>
+                            <td class="msg-cell" [title]="h.response.processingMessage || h.response.errorMessage || ''">
+                              {{ h.response.processingMessage || h.response.errorMessage || '—' }}
                             </td>
                           </tr>
                         </tbody>
@@ -397,6 +401,7 @@ interface HistoryEntry {
                               <th class="money">Indiv. YTD</th>
                               <th class="money">Family YTD</th>
                               <th>Status</th>
+                              <th>Processing message</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -430,6 +435,9 @@ interface HistoryEntry {
                                       [title]="r.errorMessage || ''">
                                   <i class="bi bi-exclamation-triangle-fill"></i>{{ r.errorCode }}
                                 </span>
+                              </td>
+                              <td class="msg-cell" [title]="r.processingMessage || r.errorMessage || ''">
+                                {{ r.processingMessage || r.errorMessage || '—' }}
                               </td>
                             </tr>
                           </tbody>
@@ -705,7 +713,7 @@ export class AppComponent {
       'PolicyId','Policy holder Id','Date of service','Coverage Main Category','Coverage Sub Category',
       'Billed Amount','Policy Holder pays','Plan Pays','Rule used',
       'Individual accumulated deductible','Family accumulated deductible',
-      'Error Code','Error Message'
+      'Error Code','Error Message','Processing message'
     ];
     const escape = (v: unknown) => {
       const s = v == null ? '' : String(v);
@@ -718,7 +726,7 @@ export class AppComponent {
         r.coverageMainCategory, r.coverageSubCategory, r.billedAmount,
         r.policyHolderPays ?? '', r.planPays ?? '', r.ruleUsed ?? '',
         r.individualAccumulatedDeductible ?? '', r.familyAccumulatedDeductible ?? '',
-        r.errorCode ?? '', r.errorMessage ?? ''
+        r.errorCode ?? '', r.errorMessage ?? '', r.processingMessage ?? ''
       ].map(escape).join(','));
     }
     const blob = new Blob([lines.join('\n')], { type: 'text/csv;charset=utf-8' });

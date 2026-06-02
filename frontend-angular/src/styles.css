@@ -103,6 +103,13 @@ body, html { background: #f4f6fb; min-height: 100%; }
 .claims-table .money-warning { color: #7a4500; font-weight: 600; }
 .claims-table .when-cell { color: #6c757d; font-size: .8rem; white-space: nowrap; }
 .claims-table .holder-cell { font-family: 'Segoe UI', monospace; font-weight: 600; color: #0d2148; }
+.claims-table .msg-cell {
+  white-space: nowrap; min-width: 22rem; max-width: 40rem;
+  overflow: hidden; text-overflow: ellipsis;
+  color: #41506b; font-size: .82rem;
+}
+.table-responsive { overflow-x: auto; }
+.table-responsive > .claims-table { min-width: max-content; }
 .claims-table .empty {
   padding: 3rem 1rem; text-align: center; color: #6c757d;
 }
